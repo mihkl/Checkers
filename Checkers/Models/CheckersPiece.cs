@@ -37,7 +37,7 @@ namespace Checkers.Models {
                     if (isAfterCapture) continue;
                     possibleMoves.Add((newRow, newColumn));
                 }
-                else {
+                else if (pieces[newIndex]?.Color != Color ){
                     var jumpRow = newRow + row;
                     var jumpColumn = newColumn + column;
                     if (jumpRow < 0 || jumpRow > 7 || jumpColumn < 0 || jumpColumn > 7) continue;

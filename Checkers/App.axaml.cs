@@ -4,6 +4,7 @@ using Avalonia.Markup.Xaml;
 
 using Checkers.ViewModels;
 using Checkers.Views;
+using System;
 
 namespace Checkers;
 
@@ -20,14 +21,14 @@ public partial class App : Application
         {
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainViewModel()
+                DataContext = new MainViewModel(Environment.GetCommandLineArgs())
             };
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
             singleViewPlatform.MainView = new MainView
             {
-                DataContext = new MainViewModel()
+                DataContext = new MainViewModel(Environment.GetCommandLineArgs())
             };
         }
 

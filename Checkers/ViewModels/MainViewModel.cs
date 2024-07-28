@@ -1,10 +1,14 @@
 ﻿using Checkers.Models;
+using Newtonsoft.Json;
 using ReactiveUI;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reactive;
 using System.Runtime.CompilerServices;
+
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Checkers.ViewModels;
 
@@ -20,6 +24,8 @@ public class MainViewModel : ViewModelBase
     public bool IsBlackTurn => !IsRedTurn;
     private bool isGameOver = false;
     private string? gameOverMessage = null;
+    private NetworkManager _networkManager;
+
     public CheckersPiece? SelectedPiece { get; set; }
 
     public bool IsGameOver {
@@ -31,8 +37,16 @@ public class MainViewModel : ViewModelBase
         get => gameOverMessage;
         set => this.RaiseAndSetIfChanged(ref gameOverMessage, value);
     }
+    public bool IsPlayer1 { get; private set; }
 
-    public MainViewModel() {
+    public MainViewModel(string[] args) {
+
+        _networkManager = new NetworkManager();
+        _networkManager.OnMessageReceived += HandleNetworkMessage;
+        _networkManager.OnServerConnected += () => IsPlayer1 = true;
+        _networkManager.OnClientConnected += () => IsPlayer1 = false;
+
+
         Board = [];
         Pieces = [];
         CurrentValidMoves = [];
@@ -42,8 +56,69 @@ public class MainViewModel : ViewModelBase
 
         InitializeBoard();
         InitializePieces();
+
+        if (args[1] == "server") {
+            StartServer();
+        } else if (args[1] == "client") {
+            StartClient();
+        }
+
+        Task.Run(() =>
+        {
+            while (true) {
+                _networkManager.PollEvents();
+                Thread.Sleep(15);
+            }
+        });
     }
 
+    private void StartServer() {
+        _networkManager.StartServer(9050);
+    }
+
+    private void StartClient() {
+        _networkManager.StartClient("127.0.0.1", 9050);
+    }
+
+    private void HandleNetworkMessage(string message) {
+        var move = JsonConvert.DeserializeObject<MoveMessage>(message);
+        ApplyMove(move);
+    }
+
+    private void ApplyMove(MoveMessage move) {
+        var selectedPiece = Pieces[move.FromIndex];
+        var piece = Pieces[move.ToIndex];
+        selectedPiece.Move(selectedPiece, piece, Pieces);
+
+        UpdateValidMoves(CurrentValidMoves);
+        UpdatePieces();
+        IsRedTurn = !IsRedTurn;
+    }
+
+    private void MakeMove(CheckersPiece piece) {
+
+        var fromIndex = Pieces.IndexOf(SelectedPiece);
+        var toIndex = Pieces.IndexOf(piece);
+        var moveMessage = new MoveMessage { FromIndex = fromIndex, ToIndex = toIndex };
+        var serializedMove = JsonConvert.SerializeObject(moveMessage);
+
+        var didCapture = SelectedPiece?.Move(SelectedPiece, piece, Pieces);
+
+        _networkManager.SendMessage(serializedMove);
+
+        if (didCapture is null or false) {
+            CurrentValidMoves = [];
+            SelectedPiece = null;
+            IsRedTurn = !IsRedTurn;
+        } else {
+            CurrentValidMoves = AddPossibleMoves(true);
+            if (CurrentValidMoves.Count == 0) {
+                SelectedPiece = null;
+                IsRedTurn = !IsRedTurn;
+            }
+        }
+        UpdateValidMoves(CurrentValidMoves);
+    }
     private void TrySelectPiece(CheckersPiece? piece) {
         if (piece is null) return;
 
@@ -91,23 +166,6 @@ public class MainViewModel : ViewModelBase
             IsGameOver = true;
             GameOverMessage = "Black Wins!";
         }
-    }
-
-    private void MakeMove(CheckersPiece piece) {
-        var didCapture = SelectedPiece?.Move(SelectedPiece, piece, Pieces);
-        if (didCapture is null or false) {
-            CurrentValidMoves = [];
-            SelectedPiece = null;
-            IsRedTurn = !IsRedTurn;
-        }
-        else {
-            CurrentValidMoves = AddPossibleMoves(true);
-            if (CurrentValidMoves.Count == 0) {
-                SelectedPiece = null;
-                IsRedTurn = !IsRedTurn;
-            }
-        }
-        UpdateValidMoves(CurrentValidMoves);
     }
 
     private void UpdateValidMoves(ObservableCollection<(int, int)> currentValidMoves) {

@@ -3,6 +3,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
+    <Configurations>Debug;Release;Server;Client</Configurations>
+    <UseConsole>true</UseConsole>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,5 +18,13 @@
     <PackageReference Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Diagnostics" Condition="'$(Configuration)'=='Client'">
+      <Version>$(AvaloniaVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="Avalonia.Diagnostics" Condition="'$(Configuration)'=='Server'">
+      <Version>$(AvaloniaVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="LiteNetLib" Version="1.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 </Project>

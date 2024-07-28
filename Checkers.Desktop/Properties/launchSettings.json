@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Checkers.Desktop": {
+      "commandName": "Project",
+      "commandLineArgs": "client"
+    }
+  }
+}

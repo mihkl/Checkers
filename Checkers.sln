@@ -9,18 +9,28 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Checkers.Desktop", "Checker
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Client|Any CPU = Client|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Server|Any CPU = Server|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{522489EB-6860-44FB-95C2-8153F08DAEC8}.Client|Any CPU.ActiveCfg = Client|Any CPU
+		{522489EB-6860-44FB-95C2-8153F08DAEC8}.Client|Any CPU.Build.0 = Client|Any CPU
 		{522489EB-6860-44FB-95C2-8153F08DAEC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{522489EB-6860-44FB-95C2-8153F08DAEC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{522489EB-6860-44FB-95C2-8153F08DAEC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{522489EB-6860-44FB-95C2-8153F08DAEC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{522489EB-6860-44FB-95C2-8153F08DAEC8}.Server|Any CPU.ActiveCfg = Server|Any CPU
+		{522489EB-6860-44FB-95C2-8153F08DAEC8}.Server|Any CPU.Build.0 = Server|Any CPU
+		{9FEE9FC0-C987-4FC6-ADC7-BF3CE6032CD5}.Client|Any CPU.ActiveCfg = Client|Any CPU
+		{9FEE9FC0-C987-4FC6-ADC7-BF3CE6032CD5}.Client|Any CPU.Build.0 = Client|Any CPU
 		{9FEE9FC0-C987-4FC6-ADC7-BF3CE6032CD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9FEE9FC0-C987-4FC6-ADC7-BF3CE6032CD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FEE9FC0-C987-4FC6-ADC7-BF3CE6032CD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FEE9FC0-C987-4FC6-ADC7-BF3CE6032CD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FEE9FC0-C987-4FC6-ADC7-BF3CE6032CD5}.Server|Any CPU.ActiveCfg = Server|Any CPU
+		{9FEE9FC0-C987-4FC6-ADC7-BF3CE6032CD5}.Server|Any CPU.Build.0 = Server|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
