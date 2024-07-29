@@ -18,7 +18,10 @@
   
   <Grid>
 
-    <Viewbox Margin="10" Grid.Column="1">
+    <Viewbox Name="SquaresBox" Margin="10" Grid.Column="1">
+      <Viewbox.RenderTransform>
+        <RotateTransform Angle="{Binding BoardRotationAngle}" />
+      </Viewbox.RenderTransform>
       <ItemsControl ItemsSource="{Binding Board}">
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>
@@ -35,7 +38,10 @@
       </ItemsControl>
     </Viewbox>
 
-    <Viewbox Margin="10" Grid.Column="1">
+    <Viewbox Name="PiecesBox" Margin="10" Grid.Column="1">
+      <Viewbox.RenderTransform>
+        <RotateTransform Angle="{Binding BoardRotationAngle}" />
+      </Viewbox.RenderTransform>
       <ItemsControl ItemsSource="{Binding Pieces}">
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>

@@ -1,4 +1,5 @@
 ﻿using Checkers.Models;
+using Checkers.Views;
 using Newtonsoft.Json;
 using ReactiveUI;
 using System;
@@ -38,6 +39,8 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref gameOverMessage, value);
     }
     public bool IsPlayer1 { get; private set; }
+    public bool IsPlayer2 => !IsPlayer1;
+    public double BoardRotationAngle => IsPlayer1 ? 0 : 180;
 
     public MainViewModel(string[] args) {
 
@@ -46,7 +49,7 @@ public class MainViewModel : ViewModelBase
         _networkManager.OnServerConnected += () => IsPlayer1 = true;
         _networkManager.OnClientConnected += () => IsPlayer1 = false;
 
-
+        isGameOver = true;
         Board = [];
         Pieces = [];
         CurrentValidMoves = [];
@@ -59,8 +62,10 @@ public class MainViewModel : ViewModelBase
 
         if (args[1] == "server") {
             StartServer();
+            
         } else if (args[1] == "client") {
             StartClient();
+            
         }
 
         Task.Run(() =>
@@ -74,6 +79,7 @@ public class MainViewModel : ViewModelBase
 
     private void StartServer() {
         _networkManager.StartServer(9050);
+        IsPlayer1 = true;
     }
 
     private void StartClient() {
@@ -92,7 +98,11 @@ public class MainViewModel : ViewModelBase
 
         UpdateValidMoves(CurrentValidMoves);
         UpdatePieces();
-        IsRedTurn = !IsRedTurn;
+        if (IsRedTurn) {
+            IsRedTurn = false;
+        } else {
+            IsRedTurn = true;
+        }
     }
 
     private void MakeMove(CheckersPiece piece) {
@@ -109,17 +119,27 @@ public class MainViewModel : ViewModelBase
         if (didCapture is null or false) {
             CurrentValidMoves = [];
             SelectedPiece = null;
-            IsRedTurn = !IsRedTurn;
+            if (IsRedTurn) {
+                IsRedTurn = false;
+            } else {
+                IsRedTurn = true;
+            }
         } else {
             CurrentValidMoves = AddPossibleMoves(true);
             if (CurrentValidMoves.Count == 0) {
                 SelectedPiece = null;
-                IsRedTurn = !IsRedTurn;
+                if (IsRedTurn) {
+                    IsRedTurn = false;
+                } else {
+                    IsRedTurn = true;
+                }
             }
         }
         UpdateValidMoves(CurrentValidMoves);
     }
     private void TrySelectPiece(CheckersPiece? piece) {
+        if (IsPlayer1 && IsBlackTurn) return;
+        if (!IsPlayer1 && IsRedTurn) return;
         if (piece is null) return;
 
         if (SelectedPiece is null && piece is EmptyPiece) {

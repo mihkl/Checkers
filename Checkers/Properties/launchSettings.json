@@ -2,7 +2,7 @@
   "profiles": {
     "Checkers": {
       "commandName": "Project",
-      "commandLineArgs": "client"
+      "commandLineArgs": ""
     }
   }
 }

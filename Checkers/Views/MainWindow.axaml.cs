@@ -1,4 +1,6 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Media;
+using Checkers.ViewModels;
 
 namespace Checkers.Views;
 
