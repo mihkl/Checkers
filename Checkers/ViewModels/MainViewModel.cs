@@ -1,20 +1,13 @@
 ﻿using Checkers.Models;
-using Checkers.Views;
 using Newtonsoft.Json;
 using ReactiveUI;
-using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Reactive;
-using System.Runtime.CompilerServices;
-
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Checkers.ViewModels;
 
-public class MainViewModel : ViewModelBase
-{
+public class MainViewModel: ViewModelBase {
     public ReactiveCommand<CheckersPiece?, Unit> SelectPiece { get; }
     public ObservableCollection<CheckersSquare> Board { get; set; }
     public ObservableCollection<CheckersPiece?> Pieces { get; set; }
@@ -46,10 +39,10 @@ public class MainViewModel : ViewModelBase
 
         _networkManager = new NetworkManager();
         _networkManager.OnMessageReceived += HandleNetworkMessage;
-        _networkManager.OnServerConnected += () => IsPlayer1 = true;
-        _networkManager.OnClientConnected += () => IsPlayer1 = false;
+        _networkManager.OnServerConnected += () => { };
+        _networkManager.OnClientConnected += () => { };
 
-        isGameOver = true;
+
         Board = [];
         Pieces = [];
         CurrentValidMoves = [];
@@ -62,17 +55,15 @@ public class MainViewModel : ViewModelBase
 
         if (args[1] == "server") {
             StartServer();
-            
+
         } else if (args[1] == "client") {
             StartClient();
-            
+
         }
 
-        Task.Run(() =>
-        {
+        Task.Run(() => {
             while (true) {
                 _networkManager.PollEvents();
-                Thread.Sleep(15);
             }
         });
     }
@@ -84,6 +75,7 @@ public class MainViewModel : ViewModelBase
 
     private void StartClient() {
         _networkManager.StartClient("127.0.0.1", 9050);
+        IsPlayer1 = false;
     }
 
     private void HandleNetworkMessage(string message) {
@@ -98,23 +90,16 @@ public class MainViewModel : ViewModelBase
 
         UpdateValidMoves(CurrentValidMoves);
         UpdatePieces();
-        if (IsRedTurn) {
-            IsRedTurn = false;
-        } else {
-            IsRedTurn = true;
-        }
+
+        IsRedTurn = move.IsRedTurn;
     }
 
     private void MakeMove(CheckersPiece piece) {
 
         var fromIndex = Pieces.IndexOf(SelectedPiece);
         var toIndex = Pieces.IndexOf(piece);
-        var moveMessage = new MoveMessage { FromIndex = fromIndex, ToIndex = toIndex };
-        var serializedMove = JsonConvert.SerializeObject(moveMessage);
 
         var didCapture = SelectedPiece?.Move(SelectedPiece, piece, Pieces);
-
-        _networkManager.SendMessage(serializedMove);
 
         if (didCapture is null or false) {
             CurrentValidMoves = [];
@@ -135,6 +120,11 @@ public class MainViewModel : ViewModelBase
                 }
             }
         }
+
+        var moveMessage = new MoveMessage { FromIndex = fromIndex, ToIndex = toIndex, IsRedTurn = IsRedTurn };
+        var serializedMove = JsonConvert.SerializeObject(moveMessage);
+        _networkManager.SendMessage(serializedMove);
+
         UpdateValidMoves(CurrentValidMoves);
     }
     private void TrySelectPiece(CheckersPiece? piece) {
@@ -169,8 +159,7 @@ public class MainViewModel : ViewModelBase
         foreach (var piece in Pieces) {
             if (piece is not EmptyPiece && piece.Color is PieceColor.Black) {
                 BlackPieces.Add(piece);
-            }
-            else if (piece is not EmptyPiece && piece.Color is PieceColor.Red) {
+            } else if (piece is not EmptyPiece && piece.Color is PieceColor.Red) {
                 RedPieces.Add(piece);
             }
         }
@@ -181,8 +170,7 @@ public class MainViewModel : ViewModelBase
         if (BlackPieces.Count == 0) {
             IsGameOver = true;
             GameOverMessage = "Red Wins!";
-        }
-        else if (RedPieces.Count == 0) {
+        } else if (RedPieces.Count == 0) {
             IsGameOver = true;
             GameOverMessage = "Black Wins!";
         }
@@ -228,17 +216,14 @@ public class MainViewModel : ViewModelBase
                         var piece = new CheckersPiece(index, PieceColor.Black);
                         BlackPieces.Add(piece);
                         Pieces.Add(piece);
-                    }
-                    else if (i > 4) {
+                    } else if (i > 4) {
                         var piece = new CheckersPiece(index, PieceColor.Red);
                         RedPieces.Add(piece);
                         Pieces.Add(piece);
-                    }
-                    else {
+                    } else {
                         Pieces.Add(new EmptyPiece(index));
                     }
-                }
-                else {
+                } else {
                     Pieces.Add(new EmptyPiece(index));
                 }
             }

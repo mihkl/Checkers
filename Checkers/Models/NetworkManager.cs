@@ -9,6 +9,7 @@ namespace Checkers.Models {
     public class MoveMessage {
         public int FromIndex { get; set; }
         public int ToIndex { get; set; }
+        public bool IsRedTurn { get; set; }
     }
     public class NetworkManager: INetEventListener {
         private NetManager _netManager;

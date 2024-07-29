@@ -2,7 +2,7 @@
   "profiles": {
     "Checkers.Desktop": {
       "commandName": "Project",
-      "commandLineArgs": "client"
+      "commandLineArgs": "server"
     }
   }
 }
