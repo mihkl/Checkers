@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35027.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bleiser", "Bleiser\Bleiser.csproj", "{37010A91-35D0-4A89-8330-9EBC3525200B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{37010A91-35D0-4A89-8330-9EBC3525200B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37010A91-35D0-4A89-8330-9EBC3525200B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37010A91-35D0-4A89-8330-9EBC3525200B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37010A91-35D0-4A89-8330-9EBC3525200B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {990397B2-7176-442B-8754-5BD6E7E810F3}
+	EndGlobalSection
+EndGlobal

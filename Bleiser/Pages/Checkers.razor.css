@@ -1,0 +1,37 @@
+﻿h3 {
+    color : red;
+}
+.square {
+    height: 100px;
+    width: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.light {
+    background-color: white;
+
+}
+.dark{
+    background-color: tan;
+
+}
+.checkers-board {
+    display: flex;
+    flex-direction: column;
+    width: 800px;
+}
+.piece {
+    height: 90px;
+    width: 90px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.row{
+    --bs-gutter-x: 0;
+}
+
+
+
+
+

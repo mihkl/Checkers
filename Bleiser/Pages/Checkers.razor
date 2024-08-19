@@ -1,0 +1,39 @@
+﻿@page "/checkers"
+
+
+
+
+
+@code {
+    static string[] args = new string[] { "server" };
+    private CheckersGameModel Game;
+
+    public Checkers() {
+        Game = new CheckersGameModel(args);
+    }
+}
+
+
+
+<PageTitle>Checkers</PageTitle>
+
+
+<div class="checkers-board">
+    @for (int row = 0; row < 8; row++)
+    {
+        <div class="row">
+            @for (int col = 0; col < 8; col++)
+            {
+                int index = row * 8 + col;
+                var square = Game.Board[index];
+                var piece = Game.Pieces[index];
+                <div class="square" style="background-color: @(square.IsValidMove ? "Orange" : square.BackgroundColor)">
+                    <button @onclick="() => Game.TrySelectPiece(piece)" style="background: none; border: none; padding: 0;">
+                    <span class="piece" style="background-color: @piece.ColorString"/>
+                    </button>
+                </div>
+            }
+        </div>
+    }
+</div>
+
