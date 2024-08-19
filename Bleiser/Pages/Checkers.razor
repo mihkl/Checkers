@@ -29,7 +29,7 @@
                 var piece = Game.Pieces[index];
                 <div class="square" style="height: @BoardParametersString; width: @BoardParametersString; background-color: @(square.IsValidMove ? "Orange" : square.BackgroundColor)">
                     <button @onclick="() => Game.TrySelectPiece(piece, Game.SelectedPiece)" style="background: none; border: none; padding: 0;">
-                    <span class="piece" style="width: @PieceParametersString; height: @PieceParametersString; background-color: @piece.ColorString"/>
+                    <span class="piece" style="border-color: @(piece is EmptyPiece ? "Transparent" : "White");  width: @PieceParametersString; height: @PieceParametersString; background-color: @piece.ColorString"/>
                     </button>
                 </div>
             }

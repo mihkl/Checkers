@@ -5,9 +5,9 @@ namespace Bleiser.Models
 {
     public class CheckersGameModel
     {
-        public static int BoardParameters => 10;
+        public static int BoardParameters => 8;
         public static string BoardParametersString => $"{800 / BoardParameters}px";
-        public static string PieceParametersString => $"{720 / BoardParameters}px";
+        public static string PieceParametersString => $"{640 / BoardParameters}px";
         public ObservableCollection<CheckersSquare> Board { get; set; }
         public ObservableCollection<CheckersPiece> Pieces { get; set; }
         public ObservableCollection<(int, int)> CurrentValidMoves { get; set; }
@@ -166,7 +166,7 @@ namespace Bleiser.Models
                 for (int j = 0; j < boardParameters; j++)
                 {
                     var index = i * boardParameters + j;
-                    if ((i + j) % 2 != 0)
+                    if ((i + j) % 2 == 0)
                     {
                         Pieces.Add(new EmptyPiece(index));
                     }

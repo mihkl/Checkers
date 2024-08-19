@@ -8,7 +8,7 @@ namespace Bleiser.Models
         public int Row { get; set; }
         public int Column { get; set; }
         public bool IsValidMove { get; set; }
-        public string BackgroundColor => (Row + Column) % 2 == 0 ? "White" : "LightGray";
+        public string BackgroundColor => (Row + Column) % 2 == 0 ? "#F0D2B4" : "#BA7A3A";
 
         public void UpdateValidMoves(ObservableCollection<(int, int)> validMoves)
         {
