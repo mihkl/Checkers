@@ -110,8 +110,7 @@ namespace Bleiser.Models
             selectedPiece.Index = index;
             var movedPiece = pieces[index];
             pieces[selectedPieceIndex] = new EmptyPiece(selectedPieceIndex);
-            if (DidCapture(pieces, originalPiecePosition, originalSelectedPiecePosition, movedPiece)) return true;
-            return false;
+            return (DidCapture(pieces, originalPiecePosition, originalSelectedPiecePosition, movedPiece));
         }
 
         private static bool DidCapture(ObservableCollection<CheckersPiece> pieces, (int, int) originalPiecePosition, (int, int) originalSelectedPiecePosition, CheckersPiece piece)
@@ -139,14 +138,7 @@ namespace Bleiser.Models
             pieces[index] = new EmptyPiece(index);
         }
 
-        private static bool IsOutOfBounds(Move move)
-        {
-            if (move.Row < 0 || move.Row > 7 || move.Column < 0 || move.Column > 7)
-            {
-                return true;
-            }
-            return false;
-        }
+        private static bool IsOutOfBounds(Move move) => (move.Row < 0 || move.Row > 7 || move.Column < 0 || move.Column > 7);
     }
 
     public sealed class EmptyPiece(int index): CheckersPiece(index) { }

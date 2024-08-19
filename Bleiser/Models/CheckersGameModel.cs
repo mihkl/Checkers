@@ -5,7 +5,7 @@ namespace Bleiser.Models
 {
     public class CheckersGameModel
     {
-
+        public (int rows, int cols) boardParameters = (8, 8);
         public ObservableCollection<CheckersSquare> Board { get; set; }
         public ObservableCollection<CheckersPiece> Pieces { get; set; }
         public ObservableCollection<(int, int)> CurrentValidMoves { get; set; }
@@ -13,136 +13,66 @@ namespace Bleiser.Models
         public ObservableCollection<CheckersPiece?> RedPieces { get; set; }
         public bool IsRedTurn { get; set; } = true;
         public bool IsBlackTurn => !IsRedTurn;
-        //private NetworkManager _networkManager;
         public CheckersPiece? SelectedPiece { get; set; }
 
         public bool IsGameOver { get; set; }
 
         public string? GameOverMessage { get; set; }
-        //public bool IsPlayer1 { get; private set; }
-        //public bool IsPlayer2 => !IsPlayer1;
-        //public double BoardRotationAngle => IsPlayer1 ? 0 : 180;
+
         public CheckersGameModel(string[] args)
         {
-            //_networkManager = new NetworkManager();
-            //_networkManager.OnMessageReceived += HandleNetworkMessage;
-            //_networkManager.OnServerConnected += () => { };
-            //_networkManager.OnClientConnected += () => { };
-
-
             Board = [];
             Pieces = [];
             CurrentValidMoves = [];
             BlackPieces = [];
             RedPieces = [];
-            //SelectPiece = ReactiveCommand.Create<CheckersPiece?>(TrySelectPiece);
 
-            InitializeBoard();
-            InitializePieces();
-
-            //if (args[1] == "server") {
-            //    StartServer();
-
-            //} else if (args[1] == "client") {
-            //    StartClient();
-
-            //}
-
-            //Task.Run(() => {
-            //    while (true) {
-            //        //_networkManager.PollEvents();
-            //    }
-            //});
+            InitializeBoard(boardParameters.rows, boardParameters.cols);
+            InitializePieces(boardParameters.rows, boardParameters.cols);
         }
-        //private void StartServer() {
-        //    _networkManager.StartServer(9050);
-        //    IsPlayer1 = true;
-        //}
+        
 
-        //private void StartClient() {
-        //    _networkManager.StartClient("127.0.0.1", 9050);
-        //    IsPlayer1 = false;
-        //}
-
-        //private void HandleNetworkMessage(string message) {
-        //    var move = JsonConvert.DeserializeObject<MoveMessage>(message);
-        //    ApplyMove(move);
-        //}
-
-        private void ApplyMove(MoveMessage move)
+        private void MakeMove(CheckersPiece piece, CheckersPiece? selectedPiece)
         {
-            var selectedPiece = Pieces[move.FromIndex];
-            var piece = Pieces[move.ToIndex];
-            selectedPiece.MovePiece(selectedPiece, piece, Pieces);
-
-            UpdateValidMoves(CurrentValidMoves);
-            UpdatePieces();
-
-            IsRedTurn = move.IsRedTurn;
-        }
-
-        private void MakeMove(CheckersPiece piece)
-        {
-            if (SelectedPiece is null) return;
-
-            var fromIndex = Pieces.IndexOf(SelectedPiece);
-            var toIndex = Pieces.IndexOf(piece);
-
-            var didCapture = SelectedPiece?.MovePiece(SelectedPiece, piece, Pieces);
+            if (selectedPiece is null) return;
+            var didCapture = selectedPiece.MovePiece(selectedPiece, piece, Pieces);
 
             if (didCapture is null or false)
             {
                 CurrentValidMoves = [];
-                SelectedPiece = null;
-                if (IsRedTurn)
-                {
-                    IsRedTurn = false;
-                }
-                else
-                {
-                    IsRedTurn = true;
-                }
+                ChangeTurn();
             }
             else
             {
-                CurrentValidMoves = AddPossibleMoves(true);
+                CurrentValidMoves = AddPossibleMoves(selectedPiece, true);
                 if (CurrentValidMoves.Count == 0)
                 {
-                    SelectedPiece = null;
-                    if (IsRedTurn)
-                    {
-                        IsRedTurn = false;
-                    }
-                    else
-                    {
-                        IsRedTurn = true;
-                    }
+                    ChangeTurn();
                 }
             }
 
-            var moveMessage = new MoveMessage { FromIndex = fromIndex, ToIndex = toIndex, IsRedTurn = IsRedTurn };
-            var serializedMove = JsonConvert.SerializeObject(moveMessage);
-            //_networkManager.SendMessage(serializedMove);
-
             UpdateValidMoves(CurrentValidMoves);
         }
-        public void TrySelectPiece(CheckersPiece? piece)
+
+        private void ChangeTurn()
+        {
+            SelectedPiece = null;
+            IsRedTurn = !IsRedTurn;
+        }
+
+        public void TrySelectPiece(CheckersPiece? piece, CheckersPiece? selectedPiece)
         {
             if (piece is null) return;
-
-            if (SelectedPiece is null && piece is EmptyPiece)
-            {
-                return;
-            }
-            if (SelectedPiece is null || SelectedPiece?.Color == piece.Color)
+            if (selectedPiece is null && piece is EmptyPiece) return;
+            if (selectedPiece is null || selectedPiece?.Color == piece.Color)
             {
                 if (piece?.Color == PieceColor.Black && IsRedTurn) return;
                 if (piece?.Color == PieceColor.Red && IsBlackTurn) return;
                 SelectedPiece = piece;
-                CurrentValidMoves = AddPossibleMoves();
+                CurrentValidMoves = AddPossibleMoves(SelectedPiece);
                 return;
             }
-            if (SelectedPiece == piece)
+            if (selectedPiece == piece)
             {
                 SelectedPiece = null;
                 CurrentValidMoves = [];
@@ -150,7 +80,7 @@ namespace Bleiser.Models
             }
             if (CurrentValidMoves.Contains((piece.Row, piece.Column)))
             {
-                MakeMove(piece);
+                MakeMove(piece, SelectedPiece);
                 UpdatePieces();
             }
         }
@@ -161,13 +91,13 @@ namespace Bleiser.Models
             RedPieces.Clear();
             foreach (var piece in Pieces)
             {
-                if (piece is not EmptyPiece && piece.Color is PieceColor.Black)
+                if (piece is not EmptyPiece)
                 {
-                    BlackPieces.Add(piece);
-                }
-                else if (piece is not EmptyPiece && piece.Color is PieceColor.Red)
-                {
-                    RedPieces.Add(piece);
+                    switch (piece.Color)
+                    {
+                        case PieceColor.Black: BlackPieces.Add(piece); break;
+                        case PieceColor.Red: RedPieces.Add(piece); break;
+                    }
                 }
             }
             CheckGameOver();
@@ -195,10 +125,10 @@ namespace Bleiser.Models
             }
         }
 
-        private ObservableCollection<(int, int)> AddPossibleMoves(bool isAfterCapture = false)
+        private ObservableCollection<(int, int)> AddPossibleMoves(CheckersPiece? selectedPiece, bool isAfterCapture = false)
         {
-            if (SelectedPiece is null) return [];
-            var moves = SelectedPiece.GetValidMoves(Pieces, isAfterCapture);
+            if (selectedPiece is null) return [];
+            var moves = selectedPiece.GetValidMoves(Pieces, isAfterCapture);
             var validMoves = new ObservableCollection<(int, int)>();
             foreach (var move in moves)
             {
@@ -211,11 +141,11 @@ namespace Bleiser.Models
             return validMoves;
         }
 
-        private void InitializeBoard()
+        private void InitializeBoard(int rows, int cols)
         {
-            for (var i = 0; i < 8; i++)
+            for (var i = 0; i < rows; i++)
             {
-                for (var j = 0; j < 8; j++)
+                for (var j = 0; j < cols; j++)
                 {
                     var square = new CheckersSquare
                     {
@@ -227,14 +157,18 @@ namespace Bleiser.Models
             }
         }
 
-        private void InitializePieces()
+        private void InitializePieces(int boardRows, int boardCols)
         {
-            for (var i = 0; i < 8; i++)
+            for (int i = 0; i < boardRows; i++)
             {
-                for (var j = 0; j < 8; j++)
+                for (int j = 0; j < boardCols; j++)
                 {
                     var index = i * 8 + j;
-                    if ((i + j) % 2 == 0)
+                    if ((i + j) % 2 != 0)
+                    {
+                        Pieces.Add(new EmptyPiece(index));
+                    }
+                    else
                     {
                         if (i < 3)
                         {
@@ -252,10 +186,6 @@ namespace Bleiser.Models
                         {
                             Pieces.Add(new EmptyPiece(index));
                         }
-                    }
-                    else
-                    {
-                        Pieces.Add(new EmptyPiece(index));
                     }
                 }
             }
