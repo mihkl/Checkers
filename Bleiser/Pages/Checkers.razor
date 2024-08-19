@@ -17,19 +17,19 @@
 
 <PageTitle>Checkers</PageTitle>
 
-
+@* <textarea @bind="Game.GameOverMessage" style="width: 100%; height: 100px; margin-bottom: 10px;"/> *@
 <div class="checkers-board">
-    @for (int row = 0; row < 8; row++)
+    @for (int row = 0; row < BoardParameters; row++)
     {
         <div class="row">
-            @for (int col = 0; col < 8; col++)
+            @for (int col = 0; col < BoardParameters; col++)
             {
-                int index = row * 8 + col;
+                int index = row * BoardParameters + col;
                 var square = Game.Board[index];
                 var piece = Game.Pieces[index];
-                <div class="square" style="background-color: @(square.IsValidMove ? "Orange" : square.BackgroundColor)">
+                <div class="square" style="height: @BoardParametersString; width: @BoardParametersString; background-color: @(square.IsValidMove ? "Orange" : square.BackgroundColor)">
                     <button @onclick="() => Game.TrySelectPiece(piece, Game.SelectedPiece)" style="background: none; border: none; padding: 0;">
-                    <span class="piece" style="background-color: @piece.ColorString"/>
+                    <span class="piece" style="width: @PieceParametersString; height: @PieceParametersString; background-color: @piece.ColorString"/>
                     </button>
                 </div>
             }

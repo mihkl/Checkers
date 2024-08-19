@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using static Bleiser.Models.CheckersGameModel;
 
 namespace Bleiser.Models
 {
@@ -13,8 +14,8 @@ namespace Bleiser.Models
             _ => "Transparent"
         };
         public int Index { get; set; } = index;
-        public int Row => Index / 8;
-        public int Column => Index % 8;
+        public int Row => Index / BoardParameters;
+        public int Column => Index % BoardParameters;
         public (int, int) Position => (Row, Column);
         public string PieceInfo => $"{Color} {(IsKing ? "King" : "Piece")} at {Row}, {Column}";
 
@@ -37,8 +38,8 @@ namespace Bleiser.Models
             {
                 var newRow = Row + row;
                 var newColumn = Column + column;
-                if (newRow < 0 || newRow > 7 || newColumn < 0 || newColumn > 7) continue;
-                var newIndex = newRow * 8 + newColumn;
+                if (newRow < 0 || newRow > BoardParameters -1 || newColumn < 0 || newColumn > BoardParameters -1) continue;
+                var newIndex = newRow * BoardParameters + newColumn;
                 if (pieces[newIndex] is EmptyPiece)
                 {
                     if (isAfterCapture) continue;
@@ -49,8 +50,8 @@ namespace Bleiser.Models
                 {
                     var jumpRow = newRow + row;
                     var jumpColumn = newColumn + column;
-                    if (jumpRow < 0 || jumpRow > 7 || jumpColumn < 0 || jumpColumn > 7) continue;
-                    var jumpIndex = jumpRow * 8 + jumpColumn;
+                    if (jumpRow < 0 || jumpRow > BoardParameters -1 || jumpColumn < 0 || jumpColumn > BoardParameters -1) continue;
+                    var jumpIndex = jumpRow * BoardParameters + jumpColumn;
                     if (pieces[jumpIndex] is EmptyPiece)
                     {
                         possibleMoves.Add(new Move(jumpRow, jumpColumn, true));
@@ -134,11 +135,11 @@ namespace Bleiser.Models
         {
             var row = (originalPiecePosition.Item1 + originalSelectedPiecePosition.Item1) / 2;
             var column = (originalPiecePosition.Item2 + originalSelectedPiecePosition.Item2) / 2;
-            var index = row * 8 + column;
+            var index = row * BoardParameters + column;
             pieces[index] = new EmptyPiece(index);
         }
 
-        private static bool IsOutOfBounds(Move move) => (move.Row < 0 || move.Row > 7 || move.Column < 0 || move.Column > 7);
+        private static bool IsOutOfBounds(Move move) => (move.Row < 0 || move.Row > BoardParameters - 1 || move.Column < 0 || move.Column > BoardParameters -1);
     }
 
     public sealed class EmptyPiece(int index): CheckersPiece(index) { }
