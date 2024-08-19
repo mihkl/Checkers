@@ -9,11 +9,11 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: grey;
+    background: tan;
 }
 
 .sidebar {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+    background-image: linear-gradient(180deg, sandybrown 0%, sandybrown 90%);
 }
 
 .top-row {
