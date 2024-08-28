@@ -1,4 +1,4 @@
-﻿namespace Bleiser.Models
+﻿namespace BlazorCheckersServer.Models
 {
     public enum PieceColor
     {

@@ -1,39 +1,89 @@
 ﻿@page "/checkers"
-
-
-
-
+@inject NavigationManager Navigation
+@using Microsoft.AspNetCore.SignalR.Client
 
 @code {
-    static string[] args = new string[] { "server" };
-    private CheckersGameModel Game;
+    private CheckersGameClientModel Game;
+    public required HubConnection hubConnection;
+    private string? gameId;
 
-    public Checkers() {
-        Game = new CheckersGameModel(args);
+    public Checkers()
+    {
+        Game = new CheckersGameClientModel();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl("https://localhost:7084/checkersHub") // Replace with your server URL
+            .Build();
+        //https://blazorcheckersserver20240827032823.azurewebsites.net/checkersHub
+        hubConnection.On<object>("ReceiveGameState", (gameState) =>
+        {
+            Game.SyncGameState(gameState);
+            this.InvokeAsync(this.StateHasChanged);
+        });
+
+        hubConnection.On<bool>("ReceivePlayer", (isPlayerOne) =>
+        {
+            Game.IsPlayerOne = isPlayerOne;
+            this.InvokeAsync(this.StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    private async Task CreateGame()
+    {
+        gameId = await hubConnection.InvokeAsync<string>("CreateGame");
+        await hubConnection.SendAsync("JoinGame", gameId);
+    }
+
+    private async Task JoinGame(string inputGameId)
+    {
+        gameId = inputGameId;
+        await hubConnection.SendAsync("JoinGame", gameId);
+    }
+
+    private async Task TrySelectPiece(CheckersPiece piece)
+    {
+        if (hubConnection != null)
+        {
+            int pieceIndex = Game.Pieces.IndexOf(piece);
+            await hubConnection.SendAsync("TrySelectPiece", gameId, pieceIndex);
+        }
     }
 }
 
+<h2>@Game.GameOverMessage</h2>
+<button @onclick="CreateGame">Create Game</button>
+<input @bind="gameId" placeholder="Game ID" />
+<button @onclick="() => JoinGame(gameId)">Join Game</button>
 
-
-<PageTitle>Checkers</PageTitle>
-
-@* <textarea @bind="Game.GameOverMessage" style="width: 100%; height: 100px; margin-bottom: 10px;"/> *@
-<div class="checkers-board">
-    @for (int row = 0; row < BoardParameters; row++)
-    {
-        <div class="row">
-            @for (int col = 0; col < BoardParameters; col++)
+@if (Game.Board.Count > 0)
+{
+    <div class="chessboard-container; @(Game.IsPlayerOne ? "" : "rotated")">
+        <div class="checkers-board">
+            @for (int row = 0; row < BoardParameters; row++)
             {
-                int index = row * BoardParameters + col;
-                var square = Game.Board[index];
-                var piece = Game.Pieces[index];
-                <div class="square" style="height: @BoardParametersString; width: @BoardParametersString; background-color: @(square.IsValidMove ? "Orange" : square.BackgroundColor)">
-                    <button @onclick="() => Game.TrySelectPiece(piece, Game.SelectedPiece)" style="background: none; border: none; padding: 0;">
-                    <span class="piece" style="border-color: @(piece is EmptyPiece ? "Transparent" : "White");  width: @PieceParametersString; height: @PieceParametersString; background-color: @piece.ColorString"/>
-                    </button>
-                </div>
+                @for (int col = 0; col < BoardParameters; col++)
+                {
+                    int index = row * BoardParameters + col;
+                    var square = Game.Board[index];
+                    var piece = Game.Pieces[index];
+                    <div class="square" style="height: @BoardParametersString; width: @BoardParametersString; background-color: @(square.IsValidMove ? "Orange" : square.BackgroundColor)">
+                        <button @onclick="() => TrySelectPiece(piece)" style="background: none; border: none; padding: 0;">
+                            <span class="piece" style="border-color: @(piece.ColorString == "Transparent" ? "Transparent" : piece.IsKing ? "Yellow" : "White");  width: @PieceParametersString; height: @PieceParametersString; background-color: @piece.ColorString">
+                                @* <h3>
+                                    @($"{square.Row}, {square.Column}")
+                                </h3> *@
+                            </span>
+                        </button>
+                    </div>
+                }
             }
         </div>
-    }
-</div>
+    </div>
+}
+
 
