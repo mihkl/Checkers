@@ -35,6 +35,5 @@ app.UseCors();
 
 app.MapHub<CheckersHub>("/checkersHub");
 
-
 app.Run();
 
